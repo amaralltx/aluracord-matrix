@@ -1,8 +1,8 @@
 {
-  "name": "Aluracord",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
+  "name": "admin",
+  "version": "admin",
+  "main": "admin",
+  "license": "admin",
   "dependencies": {
     "@skynexui/components": "^1.23.7",
     "next": "^12.0.8",
@@ -14,5 +14,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
-  }
+  },
+  "description": "admin",
+  "repository": "admin",
+  "author": "admin",
+  "private": null
 }
