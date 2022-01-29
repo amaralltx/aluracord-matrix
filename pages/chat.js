@@ -1,22 +1,66 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import React from 'react';
 import appConfig from '../config.json';
+import { createClient } from '@supabase/supabase-js'
+import { useRouter } from 'next/router';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzMzNzA5MCwiZXhwIjoxOTU4OTEzMDkwfQ.0VdIsiNibCWkI3qqizkx1nOHBvHGqMw9Chcws5gyMDk'
+const SUPABASE_URL = 'https://knrskqxdcctxniowrlcj.supabase.co';
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+function catchNewMesage(adicionaMensagem) {
+    return supabaseClient
+    .from('mensagens')
+    .on('INSERT', (respostaLive) => {
+      adicionaMensagem(respostaLive.new);
+    })
+    .subscribe();
+}
 export default function ChatPage() {
+    const roteamento = useRouter();
+    const usuarioLogado = roteamento.query.username;
     const [mensagem, setMensagem] = React.useState('');
     const [listaDeMensagens, setListaDeMensagens] = React.useState([]);
 
+    React.useEffect( () => {
+        supabaseClient
+            .from('mensagens')
+            .select('*')
+            .order('id', {ascending: false})
+            .then( ({data, error}) => {
+                setListaDeMensagens(data)
+            });
+
+            const subscription = catchNewMesage((novaMensagem) => {
+                setListaDeMensagens((valorAtualDaLista) => {
+                  return [
+                    novaMensagem,
+                    ...valorAtualDaLista,
+                  ]
+                });
+              });
+          
+              return () => {
+                subscription.unsubscribe();
+              }
+    }, [])
+    
     function handleNovaMensagem(novaMensagem) {
         const mensagem = {
-            id: listaDeMensagens.length + 1,
-            de: 'Anônimo',
+            
+            de: usuarioLogado,
             texto: novaMensagem,
         };
 
-        setListaDeMensagens([
-            mensagem,
-            ...listaDeMensagens,
-        ]);
+        supabaseClient
+            .from('mensagens')
+            .insert([
+                mensagem
+            ])
+            .then( ({data}) => {
+                
+            })
+
+        
         setMensagem('');
     }
 
@@ -24,8 +68,8 @@ export default function ChatPage() {
         <Box
             styleSheet={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                backgroundColor: appConfig.theme.colors.primary[500],
-                backgroundImage: `url(https://virtualbackgrounds.site/wp-content/uploads/2020/08/the-matrix-digital-rain.jpg)`,
+                backgroundColor: appConfig.theme.colors.neutrals[400],
+                backgroundImage: `url(https://freefrontend.com/assets/img/css-background-patterns/svg-and-css-squiggly-pattern.png)`,
                 backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundBlendMode: 'multiply',
                 color: appConfig.theme.colors.neutrals['000']
             }}
@@ -128,7 +172,7 @@ function MessageList(props) {
         <Box
             tag="ul"
             styleSheet={{
-                overflow: 'scroll',
+                overflowY: 'scroll',
                 display: 'flex',
                 flexDirection: 'column-reverse',
                 flex: 1,
@@ -157,15 +201,20 @@ function MessageList(props) {
                         >
                             <Image
                                 styleSheet={{
-                                    width: '20px',
-                                    height: '20px',
+                                    width: '40px',
+                                    height: '40px',
                                     borderRadius: '50%',
                                     display: 'inline-block',
                                     marginRight: '8px',
                                 }}
-                                src={`https://github.com/amaralltxg.png`}
+                                src={`https://github.com/${mensagem.de}.png`}
                             />
-                            <Text tag="strong">
+                            <Text tag="strong" 
+                                styleSheet={
+                                    {
+                                        size: 48,
+                                    }
+                                }>
                                 {mensagem.de}
                             </Text>
                             <Text

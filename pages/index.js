@@ -35,11 +35,8 @@ export default function PaginaInicial() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: appConfig.theme.colors.neutrals[600],
-          /*
-          backgroundImage:
-            "url(https://mcdn.wallpapersafari.com/medium/84/26/rTlqVG.png)
-          */
+          backgroundColor: appConfig.theme.colors.neutrals[400],
+          backgroundImage:`url(https://freefrontend.com/assets/img/css-background-patterns/svg-and-css-squiggly-pattern.png)`,     
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
           backgroundBlendMode: "multiply",
@@ -68,8 +65,7 @@ export default function PaginaInicial() {
             as="form"
             onSubmit={(e) => {
               e.preventDefault();
-              console.log("Submeteu")
-              roteamento.push('/chat')
+              roteamento.push(`/chat?username=${username}`)
               //window.location.href = '/chat';
             }}
             styleSheet={{
